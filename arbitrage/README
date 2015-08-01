@@ -1,0 +1,24 @@
+Bellman-Ford only detects presence of negative weight cycle,
+not what that negative cycle is.
+
+There's almost always a negative weight cycle, and in practice this
+algorithm is useless, as indicated by the author of the blog post that 
+inspired this code.
+
+This is a solution to problem presented in the textbook "Introduction to 
+Algorithms", by Cormen, Leiserson, Rivest, Stein,
+in its chapter on the single-source shortest paths problem. To explain the
+problem in terms of the Bellman-Ford algorithm, it is to:
+
+- detect the existence of a negative weight cycle in the currency graph
+- produce the path of any (not all) negative weight cycle in the graph
+
+Negative weight cycle is determined by doing an extra relaxation step
+after |V| - 1 relaxation steps.
+
+After |V| - 1 relaxations, all paths from the source to each vertex are guaranteed
+to be fixed, if there is no negative weight cycle. However, supposing
+after |V| relaxations, the distance value for a vertex v has decreased,
+then a negative weight cycle starts and ends at v.
+
+Is there anything wrong with this logic?
