@@ -63,7 +63,7 @@ def get_ranked(pds, student_id):
     out = filter(_btn, context['sections'].keys())
     if pds is not None:
         _pd_match = lambda c: get_period(c) in pds
-        out = filter(_pd_match, all_ranked)
+        out = filter(_pd_match, out)
     return out
 
 def is_better(student_id, section_A, section_B):

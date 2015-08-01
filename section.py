@@ -1,23 +1,25 @@
 import concrete
+import random
 
 class Lottery():
     def __init__(self, cap):
         assert(cap >= 0)
         self.cap = cap
         self.entries = []
-    
+
     def can_enter(self):
         return self.cap > 0
 
     def run(self):
-        self.entries = random.shuffle(array)
-        self.winners = self.entries[0:cap]
-    
+        random.shuffle(self.entries)
+        assert(type(self.entries) == type([]))
+        self.winners = self.entries[0:self.cap]
+
     def enter(self, student):
         assert(student not in self.entries)
         if self.can_enter():
             self.entries.append(student.student_id)
-    
+
     def is_winner(self, student):
         return student.student_id in self.winners
 
@@ -28,11 +30,11 @@ class Section():
     def __init__(self, s_id):
         self.s_id = s_id
         self.cap = concrete.section_cap(s_id)
-        self.p_id = concrete.section_period(s_id)
+        self.p_id = concrete.get_period(s_id)
         self.students = []
 
     def clear_lottery(self):
-        self.lottery = Lottery(cap - len(students))
+        self.lottery = Lottery(self.cap - len(self.students))
 
     def unregister(self, student_id):
         self.students.remove(student_id)

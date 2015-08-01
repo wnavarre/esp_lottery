@@ -6,7 +6,7 @@ class Period():
         self.student_id = student_id
         self.period_id = period_id
         self.section = None
-        better = concrete.ranked(period_id, student_id)
+        better = concrete.get_ranked((period_id,), student_id)
         correct_p = lambda c: c.p_id == self.p_id
         self.better = filter(correct_p, better)
         
@@ -26,7 +26,7 @@ class Student():
     def set_period(self, p_id):
         self.period = p_id
         if p_id not in self.periods:
-            self.periods[p_id] = Period
+            self.periods[p_id] = Period(p_id, self.student_id)
 
     def set_class(self, cl):
         self.get_current_period().section = cl
@@ -35,7 +35,7 @@ class Student():
         return self.get_current_period().section
 
     def enter_better_lotteries(self):
-        better = self.get_current_period.get_better()
+        better = self.get_current_period().get_better()
         for c in better:
             class_object = master.get_class(c)
             class_object.lottery.enter(self)
