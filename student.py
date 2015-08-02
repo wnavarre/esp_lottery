@@ -1,5 +1,6 @@
 import master
 import concrete
+import tools
 
 class Period():
     def __init__(self, period_id, student_id):
@@ -7,16 +8,17 @@ class Period():
         self.period_id = period_id
         self.section = None
         better = concrete.get_ranked((period_id,), student_id)
-        correct_p = lambda c: c.p_id == self.p_id
-        self.better = filter(correct_p, better)
-        
+        self.better = better
+    def get_section_id(self):
+        return (self.section.s_id if self.section else None)
     def get_better(self):
-        f = lambda poss: concrete.is_better(self.s_id, poss, self.section.s_id)
+        f = lambda poss: concrete.is_better(self.student_id, poss, self.get_section_id())
         self.better = filter(f, self.better)
         return self.better
 
 class Student():
-    def __init__(self, student_id):
+    def __init__(self, student_id, all_sections):
+        self.all_sections = all_sections
         self.student_id = student_id
         self.periods = {}
 
@@ -37,22 +39,25 @@ class Student():
     def enter_better_lotteries(self):
         better = self.get_current_period().get_better()
         for c in better:
-            class_object = master.get_class(c)
+            class_object = self.all_sections[c]
             class_object.lottery.enter(self)
 
     def choose_best_class(self):
         def _did_win(c):
-            class_object = master.get_class(c)
+            class_object = self.all_sections[c]
             return class_object.lottery.is_winner(self)
-        poss = filter(_did_win, self.lottery.better)
-        if len(poss) > 0:
-            self.get_current_period().section.unregister()
+        poss = filter(_did_win, self.get_current_period().better)
+        if not len(poss) > 0:
+            return
+        if self.get_current_period().section:
+            self.get_current_period().section.unregister(self.student_id)
             self.get_current_period().section = None
         student_id = self.student_id
         gt = lambda a, b: concrete.is_better(student_id, a, b)
-        best = max_with_gt(poss, gt)
-        self.get_current_period().section = best
-        master.get_class(best).register(self)
+        assert(len(poss) > 0)
+        best = tools.max_with_gt(poss, gt)
+        self.get_current_period().section = self.all_sections[best]
+        self.all_sections[best].register(self)
     
     def better(self):
         #list of better classes

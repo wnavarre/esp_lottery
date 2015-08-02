@@ -3,29 +3,24 @@ import student
 import section
 import time
 
-classes = {}
-students = []
 def run():
-    total_time_period_setting = 0
     sections = {}
     students = []
     periods = []
     concrete.set_context(120)
     def _load_classes():
-        global classes
-        for class_id in concrete.get_sections():
+        all_section_ids = concrete.get_sections()
+        for class_id in all_section_ids:
             cl = section.Section(class_id)
-            classes[class_id] = cl
-
+            sections[class_id] = cl
     def _load_students():
-        global students
         for student_id in concrete.get_students():
-            _student = student.Student(student_id)
+            _student = student.Student(student_id, sections)
             students.append(_student)
 
     _load_classes()
     _load_students()
-    periods = [1, 2, 3, 4]
+    periods = concrete.get_periods()
 
     for p in periods:
         start = time.clock()
@@ -34,7 +29,6 @@ def run():
         stop = time.clock()
         total_time_period_setting += stop - start
         while True:
-
             for class_object in sections.values():
                 class_object.clear_lottery()
             for _student in students:
@@ -47,6 +41,14 @@ def run():
                 break
             for _student in students:
                 _student.choose_best_class()
+
+    for code, obj in sections.items():
+        print code, "################################################"
+       import concrete
+import student
+import section
+import time
+
 
 if __name__ == '__main__':
     for i in range(1):
