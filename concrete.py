@@ -3,7 +3,6 @@ sys.path.append("/home/devsite/esp")
 sys.path.append("/home/devsite/esp/useful_scripts")
 import esp
 import script_setup
-
 import os
 
 
@@ -16,6 +15,7 @@ def set_context(program_id):
     context = {}
     prog = Program.objects.get(id=program_id)
     context['lac'] = LotteryAssignmentController(prog)
+    context['sections_by_period'] = {}
 
     # Make section tuples and put them in a dict.
     _st = lambda s: (s.emailcode(), s)
@@ -50,6 +50,7 @@ def section_cap(section_id):
     return section.capacity
 
 def is_equal(student_id, section_A, section_B):
+    global context
     if section_A is None and section_B is None:
         return True
     if section_A is None or section_B is None:
@@ -58,13 +59,21 @@ def is_equal(student_id, section_A, section_B):
     int_B = _get_student_interest(student_id, section_B)
     return int_A == int_B
 
-def get_ranked(pds, student_id):    
-    _btn = lambda c: is_better(student_id, c, None)
-    out = filter(_btn, context['sections'].keys())
+def _get_sections_in_periods(pds):
+    global context
+    if pds in context['sections_by_period']:
+        return context['sections_by_period'][pds]
+    out = context['sections'].keys()
     if pds is not None:
         _pd_match = lambda c: get_period(c) in pds
         out = filter(_pd_match, out)
+    context['sections_by_period'][pds] = out
     return out
+
+def get_ranked(pds, student_id):
+    in_period = _get_sections_in_periods(pds)
+    _btn = lambda c: is_better(student_id, c, None)
+    return filter(_btn, in_period)
 
 def is_better(student_id, section_A, section_B):
     if section_A is None:
