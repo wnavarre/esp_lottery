@@ -4,8 +4,11 @@ import section
 import time
 import cycle
 import random
+import sys
+
 
 def run():
+    print "\nNEW LOTTERY######################################"
     random.seed()
     sections = {}
     students = []
@@ -50,19 +53,15 @@ def run():
                 # Students choose the best class
                 # among those whose lotteries they won.
                 _student.choose_best_class()
-    while True:
-        print "Preparing to find cycle"
-        graph = cycle.Graph(students, sections)
-        print "Finding cycle..."
-        neg_cycle = graph.get_negative_cycle()
-        if not neg_cycle:
-            break;
-        print "Eliminating cycle..."
-        graph.eliminate_cycle(neg_cycle)
+        while True:
+            graph = cycle.Graph(students, sections)
+            neg_cycle = graph.get_negative_cycle()
+            if not neg_cycle:
+                break;
+            graph.eliminate_cycle(neg_cycle)
     return graph.graph
 
 if __name__ == '__main__':
     count = 0
-    for i in range(100):
+    for i in range(1):
         out = run()
-        print out

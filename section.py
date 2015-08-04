@@ -56,6 +56,7 @@ class Section():
 
     def space(self):
         return self.cap - len(self.students)
+
     def _moves(self, other, which):
         assert(which in ['wants', 'would'])
         _wants = lambda s: concrete.is_better(s, other, self.s_id)

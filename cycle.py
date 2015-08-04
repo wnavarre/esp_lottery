@@ -36,17 +36,27 @@ class Graph():
     def get_negative_cycle(self):
         return arbitrage.find_cycle(self.graph)
 
+    def none_wants(self, dst):
+        """
+        Returns a list of kids who currently don't have a class
+        but like section "dst," which is provided as an ID. 
+        """
+        _select = lambda s: dst in s.better()
+        return filter(_select, self.students)
+
+    def none_woulds(self, dest):
+        return []
+
     def make_shift(self, src, dst, wants, woulds, number):
-        print "MOVING STUDENTS#############"
-        print "SRC", src
-        print "DST", dst
+        if dst is None:
+            assert(all(st is None for st in wants))
+            assert(all(st is None for st in woulds))
+            return
         random.shuffle(wants)
         random.shuffle(woulds)
-
-        src_ob = self.sections[src]
+        if src is not None:
+            src_ob = self.sections[src]
         dst_ob = self.sections[dst]
-        print "WANTS", [x.student_id for x in wants]
-        print "WOULDS", [x.student_id for x in woulds]
         wants_number = min(len(wants), number)
         woulds_number = max(number - wants_number, 0)
         assert(woulds_number <= len(woulds))
@@ -54,18 +64,26 @@ class Graph():
         # Note that will might be a list of None's.
         will = wants[0:wants_number] + woulds[0:woulds_number]
         for student in will:
-            print student.student_id
             if student is None:
                 continue
             dst_ob.register(student, override=True)
             student.set_class(self.sections[dst])
-            src_ob.unregister(student.student_id)
+            if src is not None:
+                src_ob.unregister(student.student_id)
 
     def eliminate_cycle(self, cycle):
         moves = zip(cycle, tools.shifted_left(cycle[:-1]))
         wants = {} #Store ppl who want to move. 
         woulds = {} #Store ppl who wouldn't mind moving but not WANT. 
         for src, dst in moves:
+            if dst is None:
+                woulds[(src, dst)] = [None]*self.sections[src].space()
+                wants[(src, dst)] = []
+                continue
+            if src is None:
+                wants[(src, dst)]= self.none_wants(dst)
+                woulds[(src, dst)] = []
+                continue
             wants[(src, dst)] = self.sections[src].wants_moves(dst)
             woulds[(src, dst)] = self.sections[src].would_moves(dst)
         min_can = min(len(wants[i]) + len(woulds[i]) for i in moves)

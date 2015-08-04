@@ -7,6 +7,7 @@ class Period():
         self.student_id = student_id
         self.period_id = period_id
         self.section = None
+        self.equals_cache = (float("nan"), None)
         better = concrete.get_ranked((period_id,), student_id)
         self.better = better
     def get_section_id(self):
@@ -15,11 +16,19 @@ class Period():
         f = lambda poss: concrete.is_better(self.student_id, poss, self.get_section_id())
         self.better = filter(f, self.better)
         return self.better
-    def get_equals(self):# Yes, this implementation is wrong!
-        raise NotImplementedError
-        f = lambda poss: concrete.is_equal(self.student_id, poss, self.get_section_id())
-        self.equals = filter(f, self.better)
-        return self.equals
+    def get_equals(self):
+        section_id = self.get_section_id()
+        if self.equals_cache[0] == section_id:
+            return self.equals_cache[1]
+        f = lambda poss: concrete.is_equal(self.student_id, poss, section_id)
+        equals = filter(f, concrete.get_ranked((self.period_id,), self.student_id))
+        try:
+            equals.remove(section_id)
+        except ValueError:
+            if section_id is not None:
+                raise
+        self.equals_cache = (section_id, equals)
+        return equals
 
 class Student():
     def __init__(self, student_id, all_sections):
@@ -72,6 +81,5 @@ class Student():
 
     def equals(self): 
         #list of equally good classes
-        raise NotImplementedError# Because the implementation is wrong. 
         period = self.get_current_period()
         return period.get_equals()
