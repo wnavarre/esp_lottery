@@ -6,6 +6,7 @@ import cycle
 import random
 
 def run():
+    random.seed()
     sections = {}
     students = []
     students_dict = {}
@@ -62,6 +63,6 @@ def run():
 
 if __name__ == '__main__':
     count = 0
-    for i in range(20):
+    for i in range(100):
         out = run()
         print out

@@ -15,7 +15,8 @@ class Period():
         f = lambda poss: concrete.is_better(self.student_id, poss, self.get_section_id())
         self.better = filter(f, self.better)
         return self.better
-    def get_equals(self):
+    def get_equals(self):# Yes, this implementation is wrong!
+        raise NotImplementedError
         f = lambda poss: concrete.is_equal(self.student_id, poss, self.get_section_id())
         self.equals = filter(f, self.better)
         return self.equals
@@ -69,8 +70,8 @@ class Student():
         period = self.get_current_period()
         return period.get_better()
 
-    def equals(self):
+    def equals(self): 
         #list of equally good classes
-
+        raise NotImplementedError# Because the implementation is wrong. 
         period = self.get_current_period()
         return period.get_equals()
