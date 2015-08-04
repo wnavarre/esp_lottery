@@ -9,12 +9,11 @@ import sys
 
 def run():
     print "\nNEW LOTTERY######################################"
-    random.seed()
     sections = {}
     students = []
     students_dict = {}
     periods = []
-    concrete.set_context(120)
+    concrete.set_context("test1")
     def _load_classes():
         all_section_ids = concrete.get_sections()
         for class_id in all_section_ids:
@@ -53,15 +52,20 @@ def run():
                 # Students choose the best class
                 # among those whose lotteries they won.
                 _student.choose_best_class()
+        print "BEFORE CYCLING"
+        for cl, cl_obj in sections.items():
+            print cl, cl_obj.students
         while True:
             graph = cycle.Graph(students, sections)
             neg_cycle = graph.get_negative_cycle()
             if not neg_cycle:
                 break;
             graph.eliminate_cycle(neg_cycle)
+        print "AFTER CYCLING"
+        for cl, cl_obj in sections.items():
+            print cl, cl_obj.students
     return graph.graph
 
 if __name__ == '__main__':
-    count = 0
-    for i in range(1):
+    for i in range(10000):
         out = run()

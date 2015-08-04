@@ -11,6 +11,7 @@ class Graph():
         graph = self.graph_dict
         graph_dict = self.graph_dict
         _section_to_id = lambda x: x.s_id if x is not None else None
+        graph[None] = {}
         for student in students:
             student_section = student.get_current_period().section
             if _section_to_id(student_section) not in graph_dict:
@@ -41,7 +42,7 @@ class Graph():
         Returns a list of kids who currently don't have a class
         but like section "dst," which is provided as an ID. 
         """
-        _select = lambda s: dst in s.better()
+        _select = lambda s: dst in s.better() and (s.get_current_period().get_section_id() is None)
         return filter(_select, self.students)
 
     def none_woulds(self, dest):
@@ -52,17 +53,15 @@ class Graph():
             assert(all(st is None for st in wants))
             assert(all(st is None for st in woulds))
             return
-        random.shuffle(wants)
-        random.shuffle(woulds)
         if src is not None:
             src_ob = self.sections[src]
         dst_ob = self.sections[dst]
         wants_number = min(len(wants), number)
-        woulds_number = max(number - wants_number, 0)
+        woulds_number = min(max(number - wants_number, 0), len(woulds))
         assert(woulds_number <= len(woulds))
 
         # Note that will might be a list of None's.
-        will = wants[0:wants_number] + woulds[0:woulds_number]
+        will = random.sample(wants, wants_number) + random.sample(woulds, woulds_number)
         for student in will:
             if student is None:
                 continue

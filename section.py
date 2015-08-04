@@ -11,9 +11,9 @@ class Lottery():
         return self.cap > 0
 
     def run(self):
-        random.shuffle(self.entries)
         assert(type(self.entries) == type([]))
-        self.winners = self.entries[0:self.cap]
+        number_winners = min([self.cap, len(self.entries)])
+        self.winners = random.sample(self.entries, number_winners)
 
     def enter(self, student):
         assert(student not in self.entries)

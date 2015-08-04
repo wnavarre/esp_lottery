@@ -9,13 +9,17 @@ class Period():
         self.section = None
         self.equals_cache = (float("nan"), None)
         better = concrete.get_ranked((period_id,), student_id)
-        self.better = better
+        self.better_cache = (self.section, better)
     def get_section_id(self):
         return (self.section.s_id if self.section else None)
     def get_better(self):
+        section_id = self.get_section_id()
+        if self.better_cache[0] == section_id:
+            return self.better_cache[1]
         f = lambda poss: concrete.is_better(self.student_id, poss, self.get_section_id())
-        self.better = filter(f, self.better)
-        return self.better
+        better = filter(f, self.better_cache[1])
+        self.better_cache = (section_id, better)
+        return better
     def get_equals(self):
         section_id = self.get_section_id()
         if self.equals_cache[0] == section_id:
@@ -60,7 +64,7 @@ class Student():
         def _did_win(c):
             class_object = self.all_sections[c]
             return class_object.lottery.is_winner(self)
-        poss = filter(_did_win, self.get_current_period().better)
+        poss = filter(_did_win, self.get_current_period().get_better())
         if not len(poss) > 0:
             return
         if self.get_current_period().section:
