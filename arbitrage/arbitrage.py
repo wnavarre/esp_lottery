@@ -30,32 +30,16 @@ def negative_weight_cycle(predecessor,end):
             return path 
         end = predecessor[end]
 
-def find_negative_weight_cycle(graph):
+
+def find_cycle(graph):
     symbols = set()
-    
-    new_graph = {}
-    #copy the references into a new dictionary.
-    for k in graph:
-        new_graph[k] = graph[k]
-    graph = new_graph
+    for i in graph:
+        symbols.add(i)
+        for j in graph[i]:
+            symbols.add(j)
 
-    for src in graph:
-        symbols.add(src)
-        for dst in graph[src]:
-            symbols.add(dst)
-    
-
-    # universal_source should have an arrow
-    # going to all the other nodes in the graph. 
-    universal_source = "UNIVERSAL_SOURCE"
-    while universal_source in symbols: 
-        universal_source = str(random.random())
-    graph[universal_source] = {}
-    for target in symbols:
-        graph[universal_source][target] = 0
-    
-    try:
-        distances,predecessors,cycle_vertex = bellman_ford(graph,universal_source)
-        return negative_weight_cycle(predecessors,cycle_vertex)
-    except NoCycle:
-        pass
+    for src in symbols:
+        distances,predecessors,cycle_vertex = bellman_ford(graph,src)
+        if cycle_vertex is not None:
+            out = negative_weight_cycle(predecessors,cycle_vertex)
+            return out

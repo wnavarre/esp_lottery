@@ -27,11 +27,12 @@ class Lottery():
         return len(self.entries)
 
 class Section():
-    def __init__(self, s_id):
+    def __init__(self, s_id, student_dict):
         self.s_id = s_id
         self.cap = concrete.section_cap(s_id)
         self.p_id = concrete.get_period(s_id)
         self.students = []
+        self.student_dict = student_dict
 
     def clear_lottery(self):
         self.lottery = Lottery(self.cap - len(self.students))
@@ -39,18 +40,18 @@ class Section():
     def unregister(self, student_id):
         self.students.remove(student_id)
 
-    def register(self, student):
+    def register(self, student, override=False):
         assert(student.student_id not in self.students)
-        assert(self.lottery.is_winner(student))
+        assert(override or self.lottery.is_winner(student))
         self.students.append(student.student_id)
 
     def would_leave_for(self, status):
         assert(status in ["want", "willing"])
         s_id = self.s_id
         if status == "want":
-            _f = lambda x: s_id in master.get_student(x).better()
+            _f = lambda x: s_id in self.student_dict[x].better()
         if status == "willing":
-            _f = lambda x: s_id in master.get_student(x).equals()
+            _f = lambda x: s_id in self.student_dict[x].equals()
         return filter(_f, self.students)
 
     def space(self):
@@ -59,12 +60,18 @@ class Section():
         assert(which in ['wants', 'would'])
         _wants = lambda s: concrete.is_better(s, other, self.s_id)
         _would = lambda s: concrete.is_equal(s, other, self.s_id)
+        
+        #TEST!
+        _both = lambda s: (_wants(s) and _would(s))
+        both_students = filter(_both, self.students)
+        assert len(both_students) == 0, ("STUDENTS:", both_students, "OTHER:", other, "SELF:", self.s_id)
+
         if which == 'wants':
             _f = _wants
         elif which== 'would':
             _f = _would
         can_ids = filter(_f, self.students)
-        _student_object = lambda s: master.get_student(s)
+        _student_object = lambda s: self.student_dict[s]
         return map(_student_object, can_ids)
 
     def wants_moves(self, other):

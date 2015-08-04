@@ -40,9 +40,8 @@ def get_period(section_id):
     global context
     sections = context['sections']
     section = sections[section_id]
-    tbs = section.time_blocks()
-    assert(len(list(tbs))==1)
-    return tbs[0].id
+    tbs = section.meeting_times.all()
+    return [mt.id for mt in tbs][0]
 
 def section_cap(section_id):
     global context
@@ -51,13 +50,12 @@ def section_cap(section_id):
 
 def is_equal(student_id, section_A, section_B):
     global context
-    if section_A is None and section_B is None:
-        return True
-    if section_A is None or section_B is None:
-        return False
-    int_A = _get_student_interest(student_id, section_A)
-    int_B = _get_student_interest(student_id, section_B)
-    return int_A == int_B
+    return (not
+            (is_better(student_id, section_A, section_B)
+            or
+             is_better(student_id, section_B, section_A)
+         )
+        )
 
 def _get_sections_in_periods(pds):
     global context

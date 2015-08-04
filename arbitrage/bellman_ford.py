@@ -9,8 +9,6 @@ Graph API:
     
 props to: http://hetland.org/coding/python/bellman_ford.py
 """
-class NoCycle(Exception):
-    pass
 
 def initialize(graph, source):
     d = {}
@@ -40,7 +38,7 @@ def bellman_ford(graph, source):
                 #relax(u, v, graph, d, p)
                 start = u
                 return d,p,start
-    raise NoCycle
+    return d,p,start
 
 def test():
 

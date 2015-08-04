@@ -15,6 +15,10 @@ class Period():
         f = lambda poss: concrete.is_better(self.student_id, poss, self.get_section_id())
         self.better = filter(f, self.better)
         return self.better
+    def get_equals(self):
+        f = lambda poss: concrete.is_equal(self.student_id, poss, self.get_section_id())
+        self.equals = filter(f, self.better)
+        return self.equals
 
 class Student():
     def __init__(self, student_id, all_sections):
